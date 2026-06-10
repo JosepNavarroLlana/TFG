@@ -1,10 +1,17 @@
 # --- Stage 1: Compilar assets de Vue con Node ---
 FROM node:20-alpine AS frontend-builder
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm ci
+
+# FIX: evitar errores de lightningcss / peer deps en Alpine
+RUN npm install --legacy-peer-deps
+
 COPY . .
+
 RUN npm run build
+
 
 # --- Stage 2: Servidor PHP/Apache para producción ---
 FROM php:8.2-apache
@@ -33,14 +40,15 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 WORKDIR /var/www/html
 COPY . .
 
-# Copiar los assets compilados en el Stage 1
+# Copiar assets compilados del frontend
 COPY --from=frontend-builder /app/public/build ./public/build
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Ajustar permisos para storage y cache
+# Permisos Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
