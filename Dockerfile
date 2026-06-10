@@ -1,5 +1,5 @@
 # --- Stage 1: Compilar assets de Vue con Node ---
-FROM node:20-bullseye AS frontend-builder
+FROM node:20 AS frontend-builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build
+RUN rm -rf node_modules package-lock.json && npm install --legacy-peer-deps
 
 
 # --- Stage 2: Servidor PHP/Apache para producción ---
