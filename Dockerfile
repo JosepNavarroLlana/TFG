@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
+RUN npm rebuild lightningcss --update-binary
 
 COPY . .
 RUN npm run build
