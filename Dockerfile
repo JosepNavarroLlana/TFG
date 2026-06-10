@@ -4,13 +4,10 @@ FROM node:20 AS frontend-builder
 WORKDIR /app
 
 COPY package*.json ./
-
-# FIX: evitar errores de lightningcss / peer deps en Alpine
 RUN npm install --legacy-peer-deps
 
 COPY . .
-
-RUN rm -rf node_modules package-lock.json && npm install --legacy-peer-deps
+RUN npm run build
 
 
 # --- Stage 2: Servidor PHP/Apache para producción ---
@@ -36,6 +33,9 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Copiar el proyecto
 WORKDIR /var/www/html
 COPY . .
@@ -43,9 +43,7 @@ COPY . .
 # Copiar assets compilados del frontend
 COPY --from=frontend-builder /app/public/build ./public/build
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
+# Instalar dependencias PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Permisos Laravel
