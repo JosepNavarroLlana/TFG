@@ -1,5 +1,5 @@
 # --- Stage 1: Compilar assets de Vue con Node ---
-FROM node:20-alpine AS frontend-builder
+FROM node:20-bullseye AS frontend-builder
 
 WORKDIR /app
 
