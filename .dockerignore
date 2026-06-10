@@ -1,0 +1,14 @@
+node_modules
+vendor
+.git
+.env
+public/hot
+public/build
+storage/*.key
+tests
+docker-compose*
+README.md
+.editorconfig
+.gitattributes
+.gitignore
+phpunit.xml
