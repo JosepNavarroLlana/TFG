@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->foreignId('sesion_id')->constrained('sesiones')->onDelete('cascade');
-        $table->enum('estado', ['pendiente', 'confirmada', 'cancelada'])->default('pendiente');
+        $table->string('estado', 20)->default('pendiente');
         $table->decimal('total', 7, 2);
         $table->timestamps();
     });

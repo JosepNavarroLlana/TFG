@@ -5,14 +5,17 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        DB::statement("ALTER TABLE peliculas MODIFY estado ENUM('activa', 'inactiva', 'proximamente') NOT NULL DEFAULT 'activa'");
+        // Cambiar el tipo de la columna estado a VARCHAR(20) compatible con PostgreSQL
+        DB::statement("ALTER TABLE peliculas ALTER COLUMN estado TYPE VARCHAR(20)");
+        DB::statement("ALTER TABLE peliculas ALTER COLUMN estado SET DEFAULT 'activa'");
+        DB::statement("ALTER TABLE peliculas ALTER COLUMN estado SET NOT NULL");
 
         Schema::table('peliculas', function (Blueprint $table) {
-            $table->date('fecha_estreno')->nullable()->after('estado');
+            // ->after() es solo MySQL, en PostgreSQL se ignora (columna va al final)
+            $table->date('fecha_estreno')->nullable();
         });
     }
 
@@ -22,6 +25,8 @@ return new class extends Migration
             $table->dropColumn('fecha_estreno');
         });
 
-        DB::statement("ALTER TABLE peliculas MODIFY estado ENUM('activa', 'inactiva') NOT NULL DEFAULT 'activa'");
+        // Revertir a VARCHAR(20) sin valor proximamente (no se puede revertir ENUM en PG fácilmente)
+        DB::statement("ALTER TABLE peliculas ALTER COLUMN estado TYPE VARCHAR(20)");
+        DB::statement("ALTER TABLE peliculas ALTER COLUMN estado SET DEFAULT 'activa'");
     }
 };
