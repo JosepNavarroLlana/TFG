@@ -21,11 +21,12 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libpq-dev \
     zip \
     unzip \
     libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql gd zip \
+    && docker-php-ext-install pdo_pgsql pgsql gd zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Cambiar el Document Root de Apache a /var/www/html/public
