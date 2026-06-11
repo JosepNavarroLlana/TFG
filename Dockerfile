@@ -52,4 +52,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 80
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && apache2-foreground
