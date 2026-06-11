@@ -27,7 +27,7 @@ class ReservaCorreoService
 
         Mail::html($html, function ($message) use ($emailDestino, $titulo, $reserva) {
             $message
-                ->to($emailDestino, $reserva->user->name)
+                ->to($emailDestino, optional($reserva->user)->name ?? 'Cliente')
                 ->subject("Confirmación de reserva — {$titulo}");
         });
     }
