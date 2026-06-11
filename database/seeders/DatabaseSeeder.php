@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             SalaSeeder::class,
             AsientoSeeder::class,
+            SesionSeeder::class,
         ]);
     }
 }
