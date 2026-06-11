@@ -51,5 +51,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+RUN mkdir -p /var/www/html/public/images/peliculas \
+    && chown -R www-data:www-data /var/www/html/public/images \
+    && chmod -R 775 /var/www/html/public/images
+
 EXPOSE 80
 CMD php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && apache2-foreground
