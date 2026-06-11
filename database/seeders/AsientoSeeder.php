@@ -10,6 +10,8 @@ class AsientoSeeder extends Seeder
 {
     public function run(): void
     {
+        Asiento::truncate();
+
         $salas = Sala::all();
         $filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 

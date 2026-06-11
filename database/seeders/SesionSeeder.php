@@ -12,6 +12,8 @@ class SesionSeeder extends Seeder
 {
     public function run(): void
     {
+        Sesion::truncate();
+
         $peliculas = Pelicula::where('estado', 'activa')->get();
         $salas = Sala::all();
 

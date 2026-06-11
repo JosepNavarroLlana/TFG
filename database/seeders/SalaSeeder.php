@@ -9,6 +9,8 @@ class SalaSeeder extends Seeder
 {
     public function run(): void
     {
+        Sala::truncate();
+
         $salas = [
             ['nombre' => 'Sala 1', 'capacidad' => 70],
             ['nombre' => 'Sala 2', 'capacidad' => 70],
