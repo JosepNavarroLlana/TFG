@@ -56,4 +56,4 @@ RUN mkdir -p /var/www/html/public/images/peliculas \
     && chmod -R 775 /var/www/html/public/images
 
 EXPOSE 80
-CMD php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && apache2-foreground
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
