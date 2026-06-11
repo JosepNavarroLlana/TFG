@@ -23,21 +23,29 @@ class SesionSeeder extends Seeder
         $horarios = ['18:30', '19:30', '20:30', '21:30', '22:30'];
         $precio = 5.00;
 
-        $salaIndex = 0;
+        for ($dia = 0; $dia < 7; $dia++) {
+            $fecha = Carbon::now()->addDays($dia)->format('Y-m-d');
 
-        foreach ($peliculas as $pelicula) {
-            for ($dia = 0; $dia < 7; $dia++) {
-                foreach ($horarios as $hora) {
-                    $fecha = Carbon::now()->addDays($dia)->format('Y-m-d') . ' ' . $hora;
-                    $sala = $salas[$salaIndex % $salas->count()];
+            foreach ($horarios as $hora) {
+                $fechaHora = $fecha . ' ' . $hora;
+                $peliculasDisponibles = $peliculas->shuffle();
+                $salaIndex = 0;
+
+                foreach ($peliculasDisponibles as $pelicula) {
+                    if ($salaIndex >= $salas->count())
+                        break;
+
+                    $sala = $salas[$salaIndex];
 
                     Sesion::firstOrCreate(
                         [
-                            'pelicula_id' => $pelicula->id,
                             'sala_id' => $sala->id,
-                            'fecha_hora' => $fecha,
+                            'fecha_hora' => $fechaHora,
                         ],
-                        ['precio' => $precio]
+                        [
+                            'pelicula_id' => $pelicula->id,
+                            'precio' => $precio,
+                        ]
                     );
 
                     $salaIndex++;
