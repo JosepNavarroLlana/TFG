@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelicula;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PeliculaController extends Controller
 {
@@ -57,14 +60,63 @@ class PeliculaController extends Controller
     {
         $request->validate(['imagen' => 'required|image|max:4096']);
 
+        if ($this->cloudinaryConfigurado()) {
+            return response()->json([
+                'ruta' => $this->subirImagenACloudinary($request),
+            ]);
+        }
+
         $archivo = $request->file('imagen');
-        $nombre = \Illuminate\Support\Str::slug(
+        $nombre = Str::slug(
             pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME)
         ) . '-' . time() . '.' . $archivo->getClientOriginalExtension();
 
-        $archivo->move(public_path('images/peliculas'), $nombre);
+        Storage::disk('public')->putFileAs('peliculas', $archivo, $nombre);
 
-        return response()->json(['ruta' => '/images/peliculas/' . $nombre]);
+        return response()->json(['ruta' => Storage::url('peliculas/' . $nombre)]);
+    }
+
+    private function cloudinaryConfigurado(): bool
+    {
+        return filled(config('services.cloudinary.cloud_name'))
+            && filled(config('services.cloudinary.api_key'))
+            && filled(config('services.cloudinary.api_secret'));
+    }
+
+    private function subirImagenACloudinary(Request $request): string
+    {
+        $cloudName = config('services.cloudinary.cloud_name');
+        $apiKey = config('services.cloudinary.api_key');
+        $apiSecret = config('services.cloudinary.api_secret');
+        $folder = config('services.cloudinary.folder');
+        $timestamp = time();
+
+        $params = [
+            'folder' => $folder,
+            'timestamp' => $timestamp,
+        ];
+
+        $signature = sha1(
+            collect($params)
+                ->sortKeys()
+                ->map(fn ($value, $key) => "{$key}={$value}")
+                ->implode('&') . $apiSecret
+        );
+
+        $response = Http::attach(
+            'file',
+            file_get_contents($request->file('imagen')->getRealPath()),
+            $request->file('imagen')->getClientOriginalName()
+        )->post("https://api.cloudinary.com/v1_1/{$cloudName}/image/upload", [
+            'api_key' => $apiKey,
+            'folder' => $folder,
+            'timestamp' => $timestamp,
+            'signature' => $signature,
+        ]);
+
+        $response->throw();
+
+        return $response->json('secure_url');
     }
 
     public function update(Request $request, $id)
