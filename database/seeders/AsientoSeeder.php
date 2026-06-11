@@ -11,24 +11,11 @@ class AsientoSeeder extends Seeder
     public function run(): void
     {
         $salas = Sala::all();
+        $filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
         foreach ($salas as $sala) {
-            if ($sala->capacidad === 75) {
-                $filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-                $asientosPorFila = 10;
-                $extra = 5;
-            } else {
-                $filas = ['A', 'B', 'C', 'D', 'E'];
-                $asientosPorFila = 10;
-                $extra = 0;
-            }
-
             foreach ($filas as $fila) {
-                $cantidad = $asientosPorFila;
-                if ($extra > 0 && $fila === 'G') {
-                    $cantidad = $extra;
-                }
-                for ($i = 1; $i <= $cantidad; $i++) {
+                for ($i = 1; $i <= 10; $i++) {
                     Asiento::firstOrCreate([
                         'sala_id' => $sala->id,
                         'fila' => $fila,
